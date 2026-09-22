@@ -1,16 +1,21 @@
-
 {
   "alunos": [
-    {
-      "nome": "Joana",
-      "apelido": "Silva",
-      "idCurso": 1,
-      "anoCurricular": 2,
-      "idade" : 21
-    }
+    { "id": 1, "nome": "Joana", "apelido": "Silva", "idCurso": 1, "anoCurricular": 2, "idade": 21 },
+    { "id": 2, "nome": "Pedro", "apelido": "Fernandes", "idCurso": 2, "anoCurricular": 1, "idade": 19 },
+    { "id": 3, "nome": "Marta", "apelido": "Costa", "idCurso": 1, "anoCurricular": 3, "idade": 22 },
+    { "id": 4, "nome": "Rui", "apelido": "Oliveira", "idCurso": 3, "anoCurricular": 1, "idade": 18 },
+    { "id": 5, "nome": "Beatriz", "apelido": "Pereira", "idCurso": 3, "anoCurricular": 2, "idade": 20 },
+    { "id": 6, "nome": "Tiago", "apelido": "Martins", "idCurso": 4, "anoCurricular": 3, "idade": 23 },
+    { "id": 7, "nome": "Carolina", "apelido": "Ribeiro", "idCurso": 2, "anoCurricular": 2, "idade": 20 },
+    { "id": 8, "nome": "André", "apelido": "Sousa", "idCurso": 5, "anoCurricular": 1, "idade": 19 },
+    { "id": 9, "nome": "Inês", "apelido": "Carvalho", "idCurso": 4, "anoCurricular": 1, "idade": 18 },
+    { "id": 10, "nome": "Miguel", "apelido": "Rodrigues", "idCurso": 5, "anoCurricular": 3, "idade": 22 }
   ],
   "cursos": [
-    { "id" : 1, "nomeDoCurso": "Engenharia da Computação Gráfica e Multimédia" },
-    { "id" : 2, "nomeDoCurso": "Engenharia de Redes e Sistemas de Computadores" }
+    { "id": 1, "nomeDoCurso": "Engenharia da Computação Gráfica e Multimédia" },
+    { "id": 2, "nomeDoCurso": "Engenharia de Redes e Sistemas de Computadores" },
+    { "id": 3, "nomeDoCurso": "Engenharia Informática" },
+    { "id": 4, "nomeDoCurso": "Gestão de Empresas" },
+    { "id": 5, "nomeDoCurso": "Design de Comunicação" }
   ]
 }
