@@ -1,148 +1,37 @@
-# Atividade Prática #1
+# SIR - Trabalho Prático #1: Consumo e Implementação de APIs RESTful
 
-## Consumo e Implementação de APIs RESTful
+Projeto da unidade curricular de Sistemas de Informação em Rede - gestão de alunos e cursos, com front-end e back-end separados, passando por uma API simulada (JSON-Server) e depois por uma API real (Node.js + Express + MongoDB Atlas).
 
-### Objetivo Geral
+## Estrutura do repositório
 
-Consolidar os conhecimentos em desenvolvimento web com foco na criação, consumo e implementação de APIs RESTful utilizando tecnologias do ecossistema JavaScript:
-
-- Node.js + Express
-- MongoDB / MongoDB Atlas
-- JSON-Server
-- Fetch API
-- Swagger
-
-O projeto simula o ciclo completo de desenvolvimento de uma aplicação web com front-end e back-end separados, incluindo testes e deploy.
-
----
-
-## Partes do Trabalho
-
-### Parte 1: Estruturação da Base de Dados (JSON)
-
-- Criar um ficheiro `bd.json` com:
-
-  - Lista de alunos: `nome`, `apelido`, `idCurso`, `anoCurricular`
-  - Lista de cursos: `nomeDoCurso`
-
-- 📁 Diretório sugerido: `/mock-data/`
-- 📄 Entregável: `bd.json`
-
----
-
-### Parte 2: API Simulada com JSON-Server + Testes
-
-- Configurar e iniciar `json-server` com `bd.json`
-- Testar os endpoints com Postman (CRUD de alunos, leitura de cursos)
-- Exportar a coleção de testes
-
-- 📁 Diretório sugerido: `/mock-server/`
-- 📄 Entregáveis:
-  - Código de configuração (`package.json`, script json-server)
-  - Coleção `.json` do Postman em `/tests/`
-
----
-
-### Parte 3: Interface Web (CRUD de Alunos)
-
-- Desenvolver uma página web funcional para gerir alunos:
-  1. Ver alunos	
-  2. Apagar aluno
-  3. Adicionar aluno
-  4. Editar aluno
-- Opcionalmente gerir cursos
-- Utilizar `Fetch API` e programação assíncrona
-- 📁 Diretório sugerido: `/frontend/` (ver notas)
-  - 📄 Entregável: Página funcional conectada à API simulada
-
-
-Notas : 
-
-* verifique como é possível servir recursos estáticos a partir do json server
-
----
-
-### Parte 4: API RESTful real (Node.js + Express + MongoDB Atlas)
-
-- Migrar os dados para o MongoDB Atlas
-- Implementar a API Express com endpoints equivalentes ao JSON-server
-- Manter a estrutura RESTful
-- Sugestão : usar mongoose a abordagem MVC (bónus 5%)
-
-- 📁 Diretório sugerido: `/backend/`
-- 📄 Entregável: Código funcional da API com instruções
-
----
-
-### Parte 5: Deploy da Aplicação
-
-- Fazer deploy da API no [Render](https://render.com)
-- Fazer deploy do front-end no [Render](https://render.com) ou  [Vercel](https://vercel.com)
-- Adaptar o front-end para consumir a nova API
-
-📄 Incluir no `README.md`:
-
-- URL pública do front-end
-- URL da API real
-- 📄 Entregável: Links funcionais no repositório
-
----
-
-### Parte 6 : Documentação da API
-
-- Utilizar Swagger para documentar os endpoints da API
-- Incluir rota `/api-docs` na aplicação
-
-- 📁 Diretório sugerido: `/backend/docs/`
-- 📄 Entregável: Swagger funcional e acessível
-
----
-
-## Organização do Projeto e Git
-
-Dever realizar commits regulares.
-Deve utilizar branches sempre que se justifique.
-
-```text
+```
 projeto-raiz/
-│
-├── /frontend/ ← Interface web (HTML/CSS/JS)
-├── /backend/ ← API RESTful com Node.js + MongoDB
-├── /mock-server/ ← JSON-server configurado
-├── /mock-data/ ← Base de dados JSON original
-├── /tests/ ← Coleção de testes Postman
-├── README.md ← Instruções, links e notas
-└── .gitignore, etc.
+├── frontend/      # Interface web (HTML/CSS/JS), consome a API via Fetch
+├── backend/        # API RESTful real (Node.js + Express + Mongoose + MongoDB Atlas)
+├── mock-server/    # JSON-Server configurado (API simulada, Partes 2/3)
+├── mock-data/       # bd.json original
+├── tests/          # Coleção de testes Postman
+└── README.md        # este ficheiro
 ```
 
----
+Cada subpasta tem o seu próprio `README.md` com instruções específicas.
 
-## Critérios de Avaliação
+## Estado do trabalho
 
-| Critério                         | Peso |
-| -------------------------------- | ---- |
-| Base de dados JSON correta       | 10%  |
-| API simulada e testada (Postman) | 10%  |
-| Funcionalidade do front-end      | 25%  |
-| Qualidade da API real (Node.js)  | 30%  |
-| Integração front-end/backend     | 10%  |
-| Deploy funcional                 | 10%  |
-| Documentação Swagger             | 05%  |
+- [x] **Parte 1** — Base de dados JSON (`mock-data/bd.json`)
+- [x] **Parte 2** — API simulada com JSON-Server + testes Postman (`mock-server/`, `tests/`)
+- [x] **Parte 3** — Interface web (CRUD de alunos e cursos) (`frontend/`)
+- [x] **Parte 4** — API RESTful real com Express + Mongoose (MVC) + MongoDB Atlas (`backend/`)
+- [ ] **Parte 5** — Deploy (API no Render, frontend no Render/Vercel) e adaptação do frontend à API real
+- [ ] **Parte 6** — Documentação da API com Swagger (`backend/docs/`)
 
----
+## Links de deploy
 
-## Entrega
+_A preencher na Parte 5._
 
-- Entrega via **GitHub Classroom**.
-- O repositório deve conter:
-  - Código funcional
-  - README.md com instruções claras
-  - Links de deploy (front e opcionalmente back)
+- Frontend: `<url pendente>`
+- API: `<url pendente>`
 
----
+## Como correr o projeto localmente
 
-### Repositório Base
-
-Usa o repositório template inicial fornecido no GitHub Classroom.
-# T_TRAB_RESTAPI
-# T_TRAB_RESTAPI
+Ver o `README.md` de cada subpasta (`mock-server/`, `backend/`, `frontend/`) para instruções detalhadas de arranque de cada peça.
