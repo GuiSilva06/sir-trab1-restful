@@ -1,1 +1,208 @@
-<!-- Página CRUD de Alunos -->
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registo de Alunos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Registo de Alunos</h1>
+      <p class="subtitle">Interface ligada à API de alunos via Fetch API</p>
+    </header>
+
+    <main>
+      <nav class="nav-secoes" aria-label="Ir para secção">
+        <a class="nav-card" href="#secao-alunos">
+          <span class="nav-card-titulo">Alunos</span>
+          <span class="nav-card-sub">Ver tabela de alunos</span>
+        </a>
+        <a class="nav-card" href="#secao-cursos">
+          <span class="nav-card-titulo">Cursos</span>
+          <span class="nav-card-sub">Ver tabela de cursos</span>
+        </a>
+      </nav>
+
+      <section id="secao-alunos" class="secao-alunos">
+        <h2 class="secao-titulo">Alunos</h2>
+        <section class="toolbar">
+          <label class="campo-busca" for="input-busca">
+            <svg class="icone-lupa" viewBox="0 0 20 20" aria-hidden="true">
+              <circle
+                cx="8.5"
+                cy="8.5"
+                r="6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              ></circle>
+              <line
+                x1="13"
+                y1="13"
+                x2="18"
+                y2="18"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              ></line>
+            </svg>
+            <input
+              type="search"
+              id="input-busca"
+              placeholder="Procurar por nome, apelido ou curso"
+            />
+          </label>
+          <button id="btn-novo-aluno" class="btn-primary" type="button">+ Adicionar aluno</button>
+        </section>
+
+        <!-- Formulário: serve para criar e/ou editar.
+        O campo escondido "aluno-id" é o que decide qual dos dois está a ser feito -->
+        <section id="form-aluno" class="form-panel" hidden>
+          <h2 id="form-titulo">Novo aluno</h2>
+          <!-- noValidate: validação nativa do browser desligada para se poder
+          mostrar as mensagens de erro com o estilo do próprio site -->
+          <form id="aluno-form" class="form-grid" novalidate>
+            <input type="hidden" id="aluno-id" />
+
+            <label>
+              Nome
+              <input type="text" id="aluno-nome" required />
+              <span class="erro-campo" id="erro-nome"></span>
+            </label>
+
+            <label>
+              Apelido
+              <input type="text" id="aluno-apelido" required />
+              <span class="erro-campo" id="erro-apelido"></span>
+            </label>
+
+            <label>
+              Curso
+              <select id="aluno-curso" required></select>
+              <span class="erro-campo" id="erro-curso"></span>
+            </label>
+
+            <label>
+              Ano curricular
+              <input type="number" id="aluno-ano" min="1" max="5" required />
+              <span class="erro-campo" id="erro-ano"></span>
+            </label>
+
+            <label>
+              Idade (opcional)
+              <input type="number" id="aluno-idade" min="15" max="99" />
+              <span class="erro-campo" id="erro-idade"></span>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Guardar</button>
+              <button type="button" id="btn-cancelar" class="btn-secondary">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="tabela-wrap">
+          <table id="tabela-alunos">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Apelido</th>
+                <th>Curso</th>
+                <th>Ano</th>
+                <th>Idade</th>
+                <th class="col-acoes"></th>
+              </tr>
+            </thead>
+            <!-- As linhas <tr> são geradas pelo script.js a partir dos dados da API -->
+            <tbody id="tabela-corpo"></tbody>
+          </table>
+          <p id="estado-vazio" class="estado-vazio" hidden>Ainda não há alunos registados.</p>
+        </section>
+      </section>
+
+      <!-- Gestão de cursos: mesma lógica dos alunos -->
+      <section id="secao-cursos" class="secao-cursos">
+        <h2 class="secao-titulo">Cursos</h2>
+        <div class="toolbar">
+          <label class="campo-busca" for="input-busca-cursos">
+            <svg class="icone-lupa" viewBox="0 0 20 20" aria-hidden="true">
+              <circle
+                cx="8.5"
+                cy="8.5"
+                r="6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              ></circle>
+              <line
+                x1="13"
+                y1="13"
+                x2="18"
+                y2="18"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              ></line>
+            </svg>
+            <input type="search" id="input-busca-cursos" placeholder="Procurar por nome do curso" />
+          </label>
+          <button id="btn-novo-curso" class="btn-primary" type="button">+ Adicionar curso</button>
+        </div>
+
+        <section id="form-curso" class="form-panel" hidden>
+          <h2 id="form-curso-titulo">Novo curso</h2>
+          <form id="curso-form" class="form-grid" novalidate>
+            <input type="hidden" id="curso-id" />
+            <label>
+              Nome do curso
+              <input type="text" id="curso-nome" required />
+              <span class="erro-campo" id="erro-curso-nome"></span>
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Guardar</button>
+              <button type="button" id="btn-cancelar-curso" class="btn-secondary">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="tabela-wrap">
+          <table id="tabela-cursos">
+            <thead>
+              <tr>
+                <th>Nome do curso</th>
+                <th>Nº de Alunos</th>
+                <th class="col-acoes"></th>
+              </tr>
+            </thead>
+            <tbody id="tabela-cursos-corpo"></tbody>
+          </table>
+          <p id="estado-vazio-cursos" class="estado-vazio" hidden>
+            Ainda não há cursos registados.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <!-- Modal de confirmação, reutilizado sempre que é preciso confirmar uma ação destrutiva -->
+    <div id="dialog-overlay" class="overlay" hidden>
+      <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-titulo">
+        <h2 id="dialog-titulo">Confirmar ação</h2>
+        <p id="dialog-mensagem">
+          Tens a certeza que queres apagar este aluno? Esta ação não pode ser desfeita.
+        </p>
+        <div class="dialog-actions">
+          <button id="dialog-cancelar" class="btn-secondary" type="button">Cancelar</button>
+          <button id="dialog-confirmar" class="btn-perigo" type="button">Apagar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
