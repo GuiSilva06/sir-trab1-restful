@@ -1,5 +1,5 @@
-// URL base da API. Agora aponta para o backend real (Parte 4), não para o JSON-Server.
-const API_URL = 'http://localhost:4000';
+// URL base da API. Aponta para o backend publicado no Render (Parte 5).
+const API_URL = 'https://sir-trab1-api.onrender.com';
 
 // Cursos guardados em memória depois de serem carregados uma vez,
 // para não ser preciso pedir ao servidor sempre que a tabela for desenhada.
