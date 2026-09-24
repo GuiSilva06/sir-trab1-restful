@@ -23,12 +23,13 @@ Cada subpasta tem o seu próprio `README.md` com instruções específicas.
 - [x] **Parte 3** - Interface web (CRUD de alunos e cursos) (`frontend/`)
 - [x] **Parte 4** - API RESTful real com Express + Mongoose (MVC) + MongoDB Atlas (`backend/`)
 - [x] **Parte 5** - Deploy da API e do frontend no Render, frontend adaptado para consumir a API real
-- [ ] **Parte 6** - Documentação da API com Swagger (`backend/docs/`)
+- [x] **Parte 6** - Documentação da API com Swagger (`backend/docs/`)
 
 ## Links de deploy
 
 - Frontend: https://sir-trab1-frontend.onrender.com
 - API: https://sir-trab1-api.onrender.com
+- Documentação Swagger: https://sir-trab1-api.onrender.com/api-docs
 
 Nota: a API está no tier gratuito do Render, que "adormece" ao fim de ~15 minutos sem pedidos. O primeiro pedido a seguir a um período de inatividade pode demorar 30-60 segundos a responder (o servidor está a reiniciar); pedidos seguintes são instantâneos.
 

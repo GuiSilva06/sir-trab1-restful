@@ -21,7 +21,8 @@ backend/
 │   └── cursoRoutes.js      # mapeamento de URLs para o controlador de Curso
 ├── scripts/
 │   └── migrarDados.js      # migra os dados do /mock-data/bd.json para o Atlas
-├── docs/                   # documentação Swagger (Parte 6)
+├── docs/
+│   └── swagger.js           # configuração Swagger (OpenAPI), documentação em /api-docs
 ├── .env                    # variáveis de ambiente (não versionado)
 └── server.js                # ponto de entrada, liga tudo
 ```
@@ -56,6 +57,14 @@ Publicado no Render como Web Service:
 - Variáveis de ambiente definidas diretamente no dashboard do Render (não em `.env`, que não é versionado): `MONGODB_URI`, `PORT`
 
 O tier gratuito do Render "adormece" o serviço ao fim de ~15 minutos sem pedidos; o pedido seguinte a um período de inatividade demora 30-60 segundos a responder enquanto o servidor reinicia.
+
+## Documentação interativa (Swagger)
+
+Disponível em `/api-docs`:
+- Local: http://localhost:4000/api-docs
+- Publicada: https://sir-trab1-api.onrender.com/api-docs
+
+Gerada automaticamente a partir de comentários JSDoc nos ficheiros de `routes/`, configurados em `docs/swagger.js`.
 
 ## Endpoints
 
