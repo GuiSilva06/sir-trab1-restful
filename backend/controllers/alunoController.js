@@ -2,8 +2,8 @@ const Aluno = require('../models/Aluno');
 
 async function listarAlunos(pedido, resposta) {
   try {
-    // .populate('curso') troca o ObjectId guardado pelo documento Curso completo,
-    // numa só pesquisa, o mesmo que o frontend fazia à mão com cursosCache.find().
+    // .populate('curso') troca o ObjectId guardado pelo documento Curso completo, numa só pesquisa.
+    // O mesmo que o frontend fazia à mão com cursosCache.find().
     const alunos = await Aluno.find().populate('curso').sort({ nome: 1 });
     resposta.json(alunos);
   } catch (erro) {
@@ -37,7 +37,7 @@ async function criarAluno(pedido, resposta) {
 async function atualizarAluno(pedido, resposta) {
   try {
     const alunoAtualizado = await Aluno.findByIdAndUpdate(pedido.params.id, pedido.body, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     }).populate('curso');
     if (!alunoAtualizado) return resposta.status(404).json({ mensagem: 'Aluno não encontrado.' });

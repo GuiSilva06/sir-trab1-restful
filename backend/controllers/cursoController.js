@@ -38,7 +38,7 @@ async function criarCurso(pedido, resposta) {
 async function atualizarCurso(pedido, resposta) {
   try {
     const cursoAtualizado = await Curso.findByIdAndUpdate(pedido.params.id, pedido.body, {
-      new: true, // devolve o documento já atualizado, não a versão antiga
+      returnDocument: 'after', // devolve o documento já atualizado, não a versão antiga
       runValidators: true, // sem isto, o findByIdAndUpdate ignoraria as regras do schema
     });
     if (!cursoAtualizado) return resposta.status(404).json({ mensagem: 'Curso não encontrado.' });
