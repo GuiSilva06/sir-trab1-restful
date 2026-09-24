@@ -8,4 +8,5 @@ No Postman: **File → Import** → selecionar `postman-collection.json`.
 
 Precisa de um Environment com a variável `baseUrl` definida:
 - `http://localhost:3000` para testar contra o `mock-server/` (JSON-Server, Partes 2/3)
-- `http://localhost:4000` para testar contra o `backend/` (API real, Parte 4) - atenção que os nomes dos campos mudam (`idCurso` → `curso`, ver `backend/README.md`)
+- `http://localhost:4000` para testar contra o `backend/` local (API real, Parte 4) - atenção que os nomes dos campos mudam (`idCurso` → `curso`, ver `backend/README.md`)
+- `https://sir-trab1-api.onrender.com` para testar contra a API publicada (Parte 5)

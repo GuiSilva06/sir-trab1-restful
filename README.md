@@ -18,19 +18,19 @@ Cada subpasta tem o seu próprio `README.md` com instruções específicas.
 
 ## Estado do trabalho
 
-- [x] **Parte 1** — Base de dados JSON (`mock-data/bd.json`)
-- [x] **Parte 2** — API simulada com JSON-Server + testes Postman (`mock-server/`, `tests/`)
-- [x] **Parte 3** — Interface web (CRUD de alunos e cursos) (`frontend/`)
-- [x] **Parte 4** — API RESTful real com Express + Mongoose (MVC) + MongoDB Atlas (`backend/`)
-- [ ] **Parte 5** — Deploy (API no Render, frontend no Render/Vercel) e adaptação do frontend à API real
-- [ ] **Parte 6** — Documentação da API com Swagger (`backend/docs/`)
+- [x] **Parte 1** - Base de dados JSON (`mock-data/bd.json`)
+- [x] **Parte 2** - API simulada com JSON-Server + testes Postman (`mock-server/`, `tests/`)
+- [x] **Parte 3** - Interface web (CRUD de alunos e cursos) (`frontend/`)
+- [x] **Parte 4** - API RESTful real com Express + Mongoose (MVC) + MongoDB Atlas (`backend/`)
+- [x] **Parte 5** - Deploy da API e do frontend no Render, frontend adaptado para consumir a API real
+- [ ] **Parte 6** - Documentação da API com Swagger (`backend/docs/`)
 
 ## Links de deploy
 
-_A preencher na Parte 5._
+- Frontend: https://sir-trab1-frontend.onrender.com
+- API: https://sir-trab1-api.onrender.com
 
-- Frontend: `<url pendente>`
-- API: `<url pendente>`
+Nota: a API está no tier gratuito do Render, que "adormece" ao fim de ~15 minutos sem pedidos. O primeiro pedido a seguir a um período de inatividade pode demorar 30-60 segundos a responder (o servidor está a reiniciar); pedidos seguintes são instantâneos.
 
 ## Como correr o projeto localmente
 

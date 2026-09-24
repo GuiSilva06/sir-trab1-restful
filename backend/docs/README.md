@@ -2,6 +2,8 @@
 
 API real que substitui o JSON-Server das Partes 2/3, com a mesma estrutura de endpoints, agora ligada a uma base de dados MongoDB Atlas através do Mongoose, com arquitetura MVC.
 
+**Publicada em:** https://sir-trab1-api.onrender.com
+
 ## Estrutura
 
 ```
@@ -44,6 +46,16 @@ backend/
    npm run dev
    ```
    A API fica disponível em `http://localhost:4000`.
+
+## Deploy (Parte 5)
+
+Publicado no Render como Web Service:
+- Root Directory: `backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Variáveis de ambiente definidas diretamente no dashboard do Render (não em `.env`, que não é versionado): `MONGODB_URI`, `PORT`
+
+O tier gratuito do Render "adormece" o serviço ao fim de ~15 minutos sem pedidos; o pedido seguinte a um período de inatividade demora 30-60 segundos a responder enquanto o servidor reinicia.
 
 ## Endpoints
 
