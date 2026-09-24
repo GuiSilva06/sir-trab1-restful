@@ -1,6 +1,5 @@
-// URL base da API. Por enquanto aponta para o JSON-Server local (Parte 2).
-// Na Parte 5, depois do deploy, só será necessário trocar este valor.
-const API_URL = 'http://localhost:3000';
+// URL base da API. Agora aponta para o backend real (Parte 4), não para o JSON-Server.
+const API_URL = 'http://localhost:4000';
 
 // Cursos guardados em memória depois de serem carregados uma vez,
 // para não ser preciso pedir ao servidor sempre que a tabela for desenhada.
@@ -43,7 +42,7 @@ const campoBuscaCursos = document.getElementById('input-busca-cursos');
 
 // Substitui o fetch() nu em todo o ficheiro. Faz duas coisas que o fetch() sozinho não faz:
 // (1) trata um código de erro HTTP (404, 500...) como um erro de verdade;
-// (2) repete automaticamente pedidos que falharam por falha de rede (ex: "Failed to fetch" / ligação recusada).
+// (2) repete automaticamente pedidos que falharam por falha de rede.
 async function apiFetch(url, opcoes = {}, tentativas = 3) {
   for (let tentativa = 1; tentativa <= tentativas; tentativa++) {
     try {
@@ -53,8 +52,6 @@ async function apiFetch(url, opcoes = {}, tentativas = 3) {
       }
       return resposta;
     } catch (erro) {
-      // Um TypeError aqui é o fetch() a falhar por causa de rede (servidor indisponível, CORS, etc.).
-      // Um erro HTTP explícito (lançado acima) não desaparece ao se tentar outra vez, por isso sai já.
       const eErroDeRede = erro instanceof TypeError;
       if (!eErroDeRede || tentativa === tentativas) throw erro;
       await new Promise((resolve) => setTimeout(resolve, 300 * tentativa));
@@ -64,8 +61,6 @@ async function apiFetch(url, opcoes = {}, tentativas = 3) {
 
 // ---------- Carregar dados da API ----------
 
-// async/await permite escrever código assíncrono (que espera pela rede) como se fosse sequencial,
-// sem encadear vários .then().
 async function carregarCursos() {
   const resposta = await apiFetch(`${API_URL}/cursos`);
   cursosCache = await resposta.json();
@@ -84,17 +79,17 @@ async function carregarAlunos() {
 
 // ---------- Desenhar na página ----------
 
-function nomeDoCurso(idCurso) {
-  const curso = cursosCache.find((c) => c.id === idCurso);
+// Antes precisava de ir procurar o curso em cursosCache a partir de um id numérico.
+// Agora o backend já devolve o curso completo (via .populate()), ou null se o aluno não tiver curso associado.
+// Por isso esta função passa a receber o próprio objeto curso (ou null), não um id.
+function nomeDoCurso(curso) {
   return curso ? curso.nomeDoCurso : 'Curso não definido';
 }
 
-// Devolve o HTML da célula "Curso": texto normal se o curso existir,
-// ou o mesmo texto com ícone de aviso a vermelho se o idCurso do aluno
-// já não corresponder a nenhum curso (ex: o curso foi entretanto apagado).
-function celulaCurso(idCurso) {
-  const cursoExiste = cursosCache.some((c) => c.id === idCurso);
-  if (cursoExiste) return nomeDoCurso(idCurso);
+// Devolve o HTML da célula "Curso": texto normal se o aluno tiver um curso associado,
+// ou o mesmo texto com ícone de aviso a vermelho se curso for null (ex: o curso foi entretanto apagado).
+function celulaCurso(curso) {
+  if (curso) return nomeDoCurso(curso);
 
   return `<span class="curso-aviso">
     <svg class="icone-aviso" viewBox="0 0 20 20" aria-hidden="true">
@@ -102,62 +97,17 @@ function celulaCurso(idCurso) {
       <line x1="10" y1="8" x2="10" y2="11.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></line>
       <circle cx="10" cy="14" r="0.9" fill="currentColor"></circle>
     </svg>
-    ${nomeDoCurso(idCurso)}
+    ${nomeDoCurso(curso)}
   </span>`;
 }
 
 function preencherSelectCursos() {
-  // A opção em branco representa "sem curso atribuído" (idCurso: null).
-  // Sem ela, editar um aluno órfão mostraria sempre o primeiro curso da lista pré-selecionado,
-  // escondendo o facto de ele não ter, de momento, nenhum curso real associado.
+  // A opção em branco representa "sem curso atribuído".
+  // Sem ela, editar um aluno órfão mostraria sempre o primeiro curso da lista pré-selecionado.
   const opcaoVazia = '<option value="">Sem curso atribuído</option>';
   campoCurso.innerHTML =
     opcaoVazia +
-    cursosCache.map((c) => `<option value="${c.id}">${c.nomeDoCurso}</option>`).join('');
-}
-
-function filtrarCursos(termo) {
-  const termoNormalizado = normalizarTexto(termo.trim());
-  if (!termoNormalizado) return cursosCache;
-
-  return cursosCache.filter((curso) =>
-    normalizarTexto(curso.nomeDoCurso).includes(termoNormalizado),
-  );
-}
-
-function aplicarFiltroCursos() {
-  renderizarTabelaCursos(filtrarCursos(campoBuscaCursos.value));
-}
-
-function renderizarTabelaCursos(cursos) {
-  estadoVazioCursos.hidden = cursos.length > 0;
-  if (cursos.length === 0) {
-    const termo = campoBuscaCursos.value.trim();
-    estadoVazioCursos.textContent = termo
-      ? `Nenhum curso encontrado para "${termo}".`
-      : 'Ainda não há cursos registados.';
-  }
-
-  tabelaCursosCorpo.innerHTML = cursos
-    .map((curso) => {
-      // Contagem calculada aqui, a partir da cache de alunos já carregada.
-      // Não é um valor guardado na API, por isso está sempre atualizada
-      // com o que a tabela de alunos mostra neste preciso momento.
-      const numeroAlunos = alunosCache.filter((aluno) => aluno.idCurso === curso.id).length;
-
-      return `
-    <tr>
-      <td data-label="Nome do curso">${curso.nomeDoCurso}</td>
-      <td data-label="Nº de Alunos">${numeroAlunos}</td>
-      <td class="col-acoes">
-        <div class="acoes-cel">
-          <button class="btn-icone editar-curso" data-id="${curso.id}" type="button">Editar</button>
-          <button class="btn-icone apagar apagar-curso" data-id="${curso.id}" type="button">Apagar</button>
-        </div>
-      </td>
-    </tr>`;
-    })
-    .join('');
+    cursosCache.map((c) => `<option value="${c._id}">${c.nomeDoCurso}</option>`).join('');
 }
 
 // Remove acentos e baixa para minúsculas, para "joao" encontrar "João"
@@ -174,7 +124,7 @@ function filtrarAlunos(termo) {
   if (!termoNormalizado) return alunosCache;
 
   return alunosCache.filter((aluno) => {
-    const camposPesquisaveis = `${aluno.nome} ${aluno.apelido} ${nomeDoCurso(aluno.idCurso)}`;
+    const camposPesquisaveis = `${aluno.nome} ${aluno.apelido} ${nomeDoCurso(aluno.curso)}`;
     return normalizarTexto(camposPesquisaveis).includes(termoNormalizado);
   });
 }
@@ -201,17 +151,63 @@ function renderizarTabela(alunos) {
     <tr>
       <td data-label="Nome">${aluno.nome}</td>
       <td data-label="Apelido">${aluno.apelido}</td>
-      <td data-label="Curso">${celulaCurso(aluno.idCurso)}</td>
+      <td data-label="Curso">${celulaCurso(aluno.curso)}</td>
       <td data-label="Ano">${aluno.anoCurricular}</td>
       <td data-label="Idade">${aluno.idade ?? '-'}</td>
       <td class="col-acoes">
         <div class="acoes-cel">
-          <button class="btn-icone editar" data-id="${aluno.id}" type="button">Editar</button>
-          <button class="btn-icone apagar" data-id="${aluno.id}" type="button">Apagar</button>
+          <button class="btn-icone editar" data-id="${aluno._id}" type="button">Editar</button>
+          <button class="btn-icone apagar" data-id="${aluno._id}" type="button">Apagar</button>
         </div>
       </td>
     </tr>`,
     )
+    .join('');
+}
+
+function filtrarCursos(termo) {
+  const termoNormalizado = normalizarTexto(termo.trim());
+  if (!termoNormalizado) return cursosCache;
+
+  return cursosCache.filter((curso) =>
+    normalizarTexto(curso.nomeDoCurso).includes(termoNormalizado),
+  );
+}
+
+function aplicarFiltroCursos() {
+  renderizarTabelaCursos(filtrarCursos(campoBuscaCursos.value));
+}
+
+function renderizarTabelaCursos(cursos) {
+  estadoVazioCursos.hidden = cursos.length > 0;
+  if (cursos.length === 0) {
+    const termo = campoBuscaCursos.value.trim();
+    estadoVazioCursos.textContent = termo
+      ? `Nenhum curso encontrado para "${termo}".`
+      : 'Ainda não há cursos registados.';
+  }
+
+  tabelaCursosCorpo.innerHTML = cursos
+    .map((curso) => {
+      // Contagem calculada a partir da cache de alunos já carregada.
+      // Como aluno.curso vem populado (objeto completo ou null),
+      // compara-se pelo _id do curso desse objeto, não por um id numérico como antes.
+      const numeroAlunos = alunosCache.filter(
+        (aluno) => aluno.curso && aluno.curso._id === curso._id,
+      ).length;
+
+      return `
+    <tr>
+      <td data-label="Nome do curso">${curso.nomeDoCurso}</td>
+      <td data-label="Nº de Alunos">${numeroAlunos}</td>
+      <td class="col-acoes">
+        <div class="acoes-cel">
+          <button class="btn-icone editar-curso" data-id="${curso._id}" type="button">Editar</button>
+          <button class="btn-icone apagar apagar-curso" data-id="${curso._id}" type="button">Apagar</button>
+        </div>
+      </td>
+    </tr>`;
+    })
     .join('');
 }
 
@@ -221,8 +217,10 @@ function renderizarTabela(alunos) {
 // Cobre nomes como "Ana-Maria" ou "D'Ávila" sem permitir números ou outros caracteres especiais.
 const REGEX_NOME = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
 
-// Cada validador devolve uma mensagem de erro (string) ou '' se o valor for válido.
-// Mantê-los separados da função que os aplica facilita testar/ajustar cada regra.
+// Como no nome/apelido, mas com pontuação comum em nomes de cursos:
+// vírgula, apóstrofo, "&", parênteses e barra.
+const REGEX_CURSO = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ ,'&()/-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+
 function validarNome(valor) {
   const limpo = valor.trim();
   if (!limpo) return 'O nome é obrigatório.';
@@ -258,11 +256,6 @@ function validarIdade(valor) {
   return '';
 }
 
-// Como no nome/apelido, mas com pontuação comum em nomes de cursos:
-// vírgula, apóstrofo, "&", parênteses e barra (ex: "Engenharia e Gestão Industrial",
-// "Design (Multimédia)", "Engenharia Civil/Ambiental").
-const REGEX_CURSO = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ ,'&()/-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
-
 function validarNomeCurso(valor) {
   const limpo = valor.trim();
   if (!limpo) return 'O nome do curso é obrigatório.';
@@ -283,8 +276,6 @@ function aplicarValidacao(campo, mensagemErro) {
 }
 
 function validarFormulario() {
-  // Sempre os quatro, mesmo que o primeiro já seja inválido,
-  // para o utilizador ver de uma vez todos os campos a corrigir, em vez de um de cada vez.
   const nomeValido = aplicarValidacao(campoNome, validarNome(campoNome.value));
   const apelidoValido = aplicarValidacao(campoApelido, validarApelido(campoApelido.value));
   const cursoValido = aplicarValidacao(campoCurso, validarCurso(campoCurso.value));
@@ -311,23 +302,18 @@ function abrirFormularioNovo() {
 
 function abrirFormularioEdicao(aluno) {
   limparErros();
-  campoId.value = aluno.id; // preenchido = modo "editar"
+  campoId.value = aluno._id; // preenchido = modo "editar"
   campoNome.value = aluno.nome;
   campoApelido.value = aluno.apelido;
-  campoCurso.value = aluno.idCurso ?? '';
+  // aluno.curso vem populado (objeto) ou null. O <select> precisa só do _id.
+  campoCurso.value = aluno.curso ? aluno.curso._id : '';
   campoAno.value = aluno.anoCurricular;
   campoIdade.value = aluno.idade ?? '';
   formTitulo.textContent = `Editar ${aluno.nome} ${aluno.apelido}`;
   formPanel.hidden = false;
 
-  // Leva o utilizador até ao formulário com scroll suave,
-  // para não ter de subir manualmente até ao topo quando a tabela é longa.
   formPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // Reaplica a classe de destaque a cada edição.
-  // Removê-la primeiro garante que a animação corre de novo mesmo que o painel já estivesse com ela.
   formPanel.classList.remove('destaque');
-  // void para forçar o browser a "esquecer" a classe removida antes de a voltar a aplicar
   void formPanel.offsetWidth;
   formPanel.classList.add('destaque');
 }
@@ -348,7 +334,7 @@ function abrirFormularioCursoNovo() {
 
 function abrirFormularioCursoEdicao(curso) {
   limparErros();
-  campoCursoId.value = curso.id;
+  campoCursoId.value = curso._id;
   campoCursoNome.value = curso.nomeDoCurso;
   formCursoTitulo.textContent = `Editar ${curso.nomeDoCurso}`;
   formPanelCurso.hidden = false;
@@ -367,9 +353,6 @@ function fecharFormularioCurso() {
 
 // ---------- Modal de confirmação ----------
 
-// Devolve uma Promise<boolean>, tal como o confirm() nativo faria,
-// mas com o visual do próprio site. Os listeners são criados uma única vez;
-// a Promise é resolvida a partir deles consoante o botão premido.
 function abrirConfirmacao(mensagem) {
   dialogMensagem.textContent = mensagem;
   dialogOverlay.hidden = false;
@@ -395,17 +378,17 @@ function abrirConfirmacao(mensagem) {
 // ---------- Criar / Editar / Apagar ----------
 
 async function guardarAluno(evento) {
-  evento.preventDefault(); // impede o comportamento padrão do <form> (recarregar a página)
+  evento.preventDefault();
 
   if (!validarFormulario()) return;
 
   const aluno = {
     nome: campoNome.value.trim(),
     apelido: campoApelido.value.trim(),
-    idCurso: Number(campoCurso.value),
+    // Já não é preciso Number(...): o valor do <select> é o _id do curso (uma string),
+    // não um número. "|| null" cobre a opção "Sem curso atribuído", que fica com value="".
+    curso: campoCurso.value || null,
     anoCurricular: Number(campoAno.value),
-    // Se o campo ficar vazio, "idade" fica undefined e o JSON.stringify()
-    // remove a chave por completo, em vez de gravar Number('') === 0.
     idade: campoIdade.value.trim() ? Number(campoIdade.value) : undefined,
   };
 
@@ -413,15 +396,14 @@ async function guardarAluno(evento) {
 
   try {
     if (idExistente) {
-      // Modo edição: PUT substitui o recurso completo,
-      // por isso é sempre enviado o objeto todo, nunca só os campos alterados.
+      // Já não é enviado "id" no corpo.
+      // O Mongo identifica o documento pelo _id que já vai na própria URL do pedido.
       await apiFetch(`${API_URL}/alunos/${idExistente}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: Number(idExistente), ...aluno }),
+        body: JSON.stringify(aluno),
       });
     } else {
-      // Modo criação: não é enviado "id", o JSON-Server atribui-o.
       await apiFetch(`${API_URL}/alunos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -430,7 +412,7 @@ async function guardarAluno(evento) {
     }
 
     fecharFormulario();
-    await carregarAlunos(); // volta a pedir a lista atualizada ao servidor
+    await carregarAlunos();
   } catch (erro) {
     console.error('Erro ao guardar aluno:', erro);
     alert('Não foi possível guardar o aluno. Vê a consola (F12) para mais detalhes.');
@@ -466,7 +448,7 @@ async function guardarCurso(evento) {
       await apiFetch(`${API_URL}/cursos/${idExistente}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: Number(idExistente), ...curso }),
+        body: JSON.stringify(curso),
       });
     } else {
       await apiFetch(`${API_URL}/cursos`, {
@@ -477,9 +459,6 @@ async function guardarCurso(evento) {
     }
 
     fecharFormularioCurso();
-    // As duas recargas são necessárias: a de cursos atualiza esta tabela e o
-    // <select> do formulário de alunos; a de alunos atualiza os nomes de curso
-    // já mostrados na tabela de alunos (podem ter mudado com uma edição).
     await carregarCursos();
     await carregarAlunos();
   } catch (erro) {
@@ -489,31 +468,23 @@ async function guardarCurso(evento) {
 }
 
 async function apagarCurso(id) {
-  // Guarda a lista de afetados ANTES de apagar, para os poder atualizar a seguir.
-  const alunosAfetados = alunosCache.filter((aluno) => aluno.idCurso === id);
+  // Contagem só para a mensagem do modal. A desassociação em si já não é feita aqui:
+  // o backend trata disso sozinho (updateMany no cursoController),
+  // por isso já não há um "for" a fazer PUT aluno a aluno como no mock-server.
+  const numeroAfetados = alunosCache.filter(
+    (aluno) => aluno.curso && aluno.curso._id === id,
+  ).length;
 
   const mensagem =
-    alunosAfetados.length > 0
-      ? `Este curso tem ${alunosAfetados.length} aluno(s) associado(s). Vão ficar sem curso atribuído. Continuar?`
+    numeroAfetados > 0
+      ? `Este curso tem ${numeroAfetados} aluno(s) associado(s). Vão ficar sem curso atribuído. Continuar?`
       : 'Tens a certeza que queres apagar este curso?';
 
   const confirmado = await abrirConfirmacao(mensagem);
   if (!confirmado) return;
 
   try {
-    // Antes de apagar o curso, desliga explicitamente cada aluno afetado (idCurso: null),
-    // em vez de deixar o id antigo gravado. Feito um de cada vez (em vez de Promise.all),
-    // para não disparar várias escritas simultâneas no bd.json.
-    for (const aluno of alunosAfetados) {
-      await apiFetch(`${API_URL}/alunos/${aluno.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...aluno, idCurso: null }),
-      });
-    }
-
     await apiFetch(`${API_URL}/cursos/${id}`, { method: 'DELETE' });
-
     await carregarCursos();
     await carregarAlunos();
   } catch (erro) {
@@ -534,32 +505,13 @@ document.getElementById('btn-cancelar-curso').addEventListener('click', fecharFo
 formCurso.addEventListener('submit', guardarCurso);
 campoBuscaCursos.addEventListener('input', aplicarFiltroCursos);
 
-tabelaCursosCorpo.addEventListener('click', async (evento) => {
-  const botao = evento.target.closest('button');
-  if (!botao) return;
-
-  const id = Number(botao.dataset.id);
-
-  if (botao.classList.contains('apagar-curso')) {
-    await apagarCurso(id);
-    return;
-  }
-
-  if (botao.classList.contains('editar-curso')) {
-    const resposta = await apiFetch(`${API_URL}/cursos/${id}`);
-    const curso = await resposta.json();
-    abrirFormularioCursoEdicao(curso);
-  }
-});
-
-// Delegação de eventos: em vez de um listener por botão (recriação a cada renderização),
-// é usado UM listener no <tbody> e verifica-se em qual botão o clique realmente aconteceu.
-// Funciona mesmo para linhas criadas depois deste código correr.
+// Delegação de eventos: um único listener no <tbody>, em vez de um por botão.
+// Os ids passam a ser strings (_id do Mongo), por isso já não há Number(...) aqui.
 tabelaCorpo.addEventListener('click', async (evento) => {
   const botao = evento.target.closest('button');
   if (!botao) return;
 
-  const id = Number(botao.dataset.id);
+  const id = botao.dataset.id;
 
   if (botao.classList.contains('apagar')) {
     await apagarAluno(id);
@@ -573,10 +525,26 @@ tabelaCorpo.addEventListener('click', async (evento) => {
   }
 });
 
+tabelaCursosCorpo.addEventListener('click', async (evento) => {
+  const botao = evento.target.closest('button');
+  if (!botao) return;
+
+  const id = botao.dataset.id;
+
+  if (botao.classList.contains('apagar-curso')) {
+    await apagarCurso(id);
+    return;
+  }
+
+  if (botao.classList.contains('editar-curso')) {
+    const resposta = await apiFetch(`${API_URL}/cursos/${id}`);
+    const curso = await resposta.json();
+    abrirFormularioCursoEdicao(curso);
+  }
+});
+
 // ---------- Arranque ----------
 
-// Os cursos têm de estar carregados antes dos alunos,
-// porque a tabela precisa de nomeDoCurso() para mostrar o nome do curso de cada aluno.
 (async function iniciar() {
   await carregarCursos();
   await carregarAlunos();
